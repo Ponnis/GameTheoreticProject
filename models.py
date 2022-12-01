@@ -1,6 +1,7 @@
 # Models and utilities for the pokemon games and likes go here
 from enum import Enum
 import numpy as np
+import nashpy
 
 
 class Types(Enum):
@@ -64,9 +65,10 @@ def calculateUtilities(team1, team2):
     return utilities
 
 
-# Calculate the mixed nash for a given game
+# Calculate the mixed nash for a given zero-sum game
 def calculateNash(pokemon_game):
-    nash_EQs = np.array([(1, 1), (0, 0)])
     utilities = pokemon_game.utility_matrix
+    nash_game = nashpy.Game(utilities)
+    nash_EQs = nash_game.support_enumeration()
 
-    return nash_EQs
+    return list(nash_EQs)
