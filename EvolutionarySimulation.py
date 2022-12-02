@@ -13,7 +13,7 @@ class EvolutionarySimulation():
     # Generates teams of initial players. Right now it makes one of each combinations (including more types on the same team).
     # Might change to something else later. This was easier to implement.
     def initialize_players(self):
-        player_list = np.zeros((180,self.team_size))
+        player_list = np.zeros((pow(18,3),self.team_size))
         i = 0
         for mon1 in m.Types:
             for mon2 in m.Types:
@@ -49,6 +49,5 @@ class EvolutionarySimulation():
         return None
 
 
-sim = EvolutionarySimulation()
-print(sim.player_list)
+sim = EvolutionarySimulation();
 
