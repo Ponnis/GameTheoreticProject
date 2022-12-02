@@ -70,3 +70,9 @@ def calculateNash(pokemon_game):
     utilities = pokemon_game.utility_matrix
 
     return nash_EQs
+
+# Perform a battle with selections based on the nash_EQ and return the resulting score for each player
+# Output: [scoreP1, scoreP2]
+def battle(pokemon_game):
+    scores = [0,0]
+    return scores
