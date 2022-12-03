@@ -2,6 +2,7 @@
 from enum import Enum
 import numpy as np
 import nashpy
+import itertools
 
 
 class Types(Enum):
@@ -60,9 +61,39 @@ class PokemonGame():
 
 # Calculate the utility matrix for two given teams
 def calculateUtilities(team1, team2):
-    utilities = np.zeros((6, 6))
+    utilities = np.zeros((6, 6), dtype='i,i')
+    print(list(range(3)))
+    team1_permutations = list(itertools.permutations(team1))
+    team2_permutations = list(itertools.permutations(team2))
+    print(team2_permutations[0][0].value)
+    print(team2_permutations)
+    for i in range(len(team1_permutations)):
+        for j in range(len(team2_permutations)):
+            team1_effectiveness = np.zeros(3)
+            team2_effectiveness = np.zeros(3)
+            for k in range(3):
+                team2_effectiveness[k] = type_chart[team1_permutations[i][k].value, team2_permutations[j][k].value]
+                team1_effectiveness[k] = type_chart[team2_permutations[j][k].value, team1_permutations[i][k].value]
+
+            utilities[i, j] = effectivenessToUtility(team1_effectiveness, team2_effectiveness)
 
     return utilities
+
+
+def effectivenessToUtility(team1_utilities, team2_utilities):
+    p1_utility = 0
+    p2_utility = 0
+
+    for i in range(len(team1_utilities)):
+        diff = team1_utilities[i] - team2_utilities[i]
+        if diff > 0:
+            p1_utility += 1
+            p2_utility -= 1
+        if diff < 0:
+            p2_utility += 1
+            p1_utility -= 1
+
+    return p1_utility, p2_utility
 
 
 # Calculate the mixed nash for a given zero-sum game
@@ -73,9 +104,9 @@ def calculateNash(pokemon_game):
 
     return list(nash_EQs)
 
+
 # Perform a battle with selections based on the nash_EQ and return the resulting score for each player
 # Output: [scoreP1, scoreP2]
 def battle(pokemon_game):
-    scores = [0,0]
+    scores = [0, 0]
     return scores
-
