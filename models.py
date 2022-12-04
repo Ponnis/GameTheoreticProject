@@ -95,14 +95,44 @@ def effectivenessToUtility(team1_utilities, team2_utilities):
 
     return p1_utility, p2_utility
 
+def splitUtilities(utilities):
+    player1_utilities = np.zeros((6, 6), dtype='i')
+    player2_utilities = np.zeros((6, 6), dtype='i')
+    for i in range(len(utilities)):
+        for j in range(len(utilities)):
+            player1_utilities[i, j] = utilities[i, j][0]
+            player2_utilities[i, j] = utilities[i, j][1]
+
+    return player1_utilities, player2_utilities
+
 
 # Calculate the mixed nash for a given zero-sum game
 def calculateNash(pokemon_game):
     utilities = pokemon_game.utility_matrix
-    nash_game = nashpy.Game(utilities)
+    A, B = splitUtilities(utilities)
+    nash_game = nashpy.Game(A, B)
     nash_EQs = nash_game.support_enumeration()
 
     return list(nash_EQs)
+
+
+# def calculateNash2(game):
+# for every row
+# for every column
+# Check player 1, can a better move be made?
+# Check player 2, can a better move be made?
+# if neither:
+# nash eq
+# else:
+# not nash eq
+
+# OR
+
+# start with player 1
+# mark indices where it has the highest utility in a row
+# now player 2
+# mark indices where it has the highest utility in a column
+# match indices , if match, that is a nash eq.
 
 
 # Perform a battle with selections based on the nash_EQ and return the resulting score for each player
