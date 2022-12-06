@@ -26,9 +26,9 @@ class Types(Enum):
     FAIRY = 17
 
 
-pokemon_types = ["Nrml", "Fire", "Water", "Elec", "Grass", "Ice",
-                 "Fight", "Psn", "Grnd", "Fly", "Psyc",
-                 "Bug", "Rock", "Ghost", "Drgn", "Dark", "Steel", "Fairy"]
+pokemon_types = ["Nor", "Fir", "Wtr", "Ele", "Grs", "Ice",
+                 "Fig", "Psn", "Gnd", "Fly", "Psy",
+                 "Bug", "Rck", "Gst", "Drg", "Drk", "Stl", "Fry"]
 pokemon_types_full = ["Normal", "Fire", "Water", "Electric", "Grass", "Ice",
                       "Fighting", "Poison", "Ground", "Flying", "Psychic",
                       "Bug", "Rock", "Ghost", "Dragon", "Dark", "Steel", "Fairy"]
@@ -66,14 +66,14 @@ class PokemonGame():
 
 # Calculate the utility matrix for two given teams
 def calculateUtilities(team1, team2):
-    utilities = np.zeros((6, 6), dtype='i,i')
     team1_permutations = list(itertools.permutations(team1))
     team2_permutations = list(itertools.permutations(team2))
+    utilities = np.zeros((len(team1_permutations), len(team1_permutations)), dtype='i,i')
     for i in range(len(team1_permutations)):
         for j in range(len(team2_permutations)):
-            team1_effectiveness = np.zeros(3)
-            team2_effectiveness = np.zeros(3)
-            for k in range(3):
+            team1_effectiveness = np.zeros(len(team1))
+            team2_effectiveness = np.zeros(len(team1))
+            for k in range(len(team1)):
                 team2_effectiveness[k] = type_chart[team1_permutations[i][k].value, team2_permutations[j][k].value]
                 team1_effectiveness[k] = type_chart[team2_permutations[j][k].value, team1_permutations[i][k].value]
 
@@ -97,9 +97,11 @@ def effectivenessToUtility(team1_utilities, team2_utilities):
 
     return p1_utility, p2_utility
 
+
 def splitUtilities(utilities):
-    player1_utilities = np.zeros((6, 6), dtype='i')
-    player2_utilities = np.zeros((6, 6), dtype='i')
+    m_len = int(np.sqrt(utilities.size))
+    player1_utilities = np.zeros((m_len, m_len), dtype='i')
+    player2_utilities = np.zeros((m_len, m_len), dtype='i')
     for i in range(len(utilities)):
         for j in range(len(utilities)):
             player1_utilities[i, j] = utilities[i, j][0]
@@ -119,7 +121,7 @@ def calculateNash(pokemon_game):
 
 
 def convertEnumToString(enums_permutations):
-    string_permutations = np.zeros((6, 3), dtype=np.dtype('U100'))
+    string_permutations = np.zeros((len(enums_permutations), int(len(enums_permutations) / 2)), dtype=np.dtype('U100'))
     for i in range(len(enums_permutations)):
         current = enums_permutations[i]
         for j in range(len(current)):
