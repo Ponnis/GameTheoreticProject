@@ -72,6 +72,7 @@ class EvolutionarySimulation():
             population_filled += num_copies
 
         # Step 3: Possible trades.
+        # TODO (But not necessary for the code to run)
 
         # Step 4: Possible "mutations". Each player has a probability for each of their Pokémon to be traded for another
         # one at random with uniform distribution.
@@ -87,8 +88,9 @@ class EvolutionarySimulation():
         return self.player_list
 
 
-sim = EvolutionarySimulation()
-sim.play_one_round()
+# --------- SOME LINES TO TEST THE METHODS ---------
+#sim = EvolutionarySimulation()
+#sim.play_one_round()
 
 
 
