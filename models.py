@@ -62,18 +62,17 @@ class PokemonGame():
 # Calculate the utility matrix for two given teams
 def calculateUtilities(team1, team2):
     utilities = np.zeros((6, 6), dtype='i,i')
-    print(list(range(3)))
     team1_permutations = list(itertools.permutations(team1))
     team2_permutations = list(itertools.permutations(team2))
-    print(team2_permutations[0][0].value)
-    print(team2_permutations)
     for i in range(len(team1_permutations)):
         for j in range(len(team2_permutations)):
             team1_effectiveness = np.zeros(3)
             team2_effectiveness = np.zeros(3)
-            for k in range(3):
-                team2_effectiveness[k] = type_chart[team1_permutations[i][k].value, team2_permutations[j][k].value]
-                team1_effectiveness[k] = type_chart[team2_permutations[j][k].value, team1_permutations[i][k].value]
+            for k in range(len(team1)):
+                team1_mon = team1_permutations[i][k].value
+                team2_mon = team2_permutations[j][k].value
+                team2_effectiveness[k] = type_chart[team1_mon, team2_mon]
+                team1_effectiveness[k] = type_chart[team2_mon, team1_mon]
 
             utilities[i, j] = effectivenessToUtility(team1_effectiveness, team2_effectiveness)
 
@@ -136,17 +135,20 @@ def calculateNash(utilities):
 
 # Perform a battle with selections based on the nash_EQ and return the resulting score for each player
 # Output: [scoreP1, scoreP2]
-def battle(pokemon_game,num_rounds):
+def battle(team1,team2,num_rounds):
+    utility_matrix = calculateUtilities(team1, team2)
+    nash_eqs = calculateNash(utility_matrix)
+
     p1_pick = -1
     p2_pick = -1
     scores = [0,0]
-    num_options = len(pokemon_game.nash_eqs[0][0])
+    num_options = len(nash_eqs[0][0])
     for n in range(num_rounds):
         rP1 = np.random.rand()
         rP2 = np.random.rand()
         for k in range(num_options):
-            mixed_k1 = pokemon_game.nash_eqs[0][0][k]
-            mixed_k2 = pokemon_game.nash_eqs[0][1][k]
+            mixed_k1 = nash_eqs[0][0][k]
+            mixed_k2 = nash_eqs[0][1][k]
             if rP1 < mixed_k1:
                 p1_pick = k
             else:
@@ -156,9 +158,8 @@ def battle(pokemon_game,num_rounds):
             else:
                 rP2 -= mixed_k2
 
-        print(scores[0])
-        scores[0] += pokemon_game.utility_matrix[p1_pick][p2_pick][0]
-        scores[1] += pokemon_game.utility_matrix[p1_pick][p2_pick][1]
+        scores[0] += utility_matrix[p1_pick][p2_pick][0]
+        scores[1] += utility_matrix[p1_pick][p2_pick][1]
     scores[0] = scores[0]/num_rounds
     scores[1] = scores[1]/num_rounds
 
