@@ -26,9 +26,12 @@ class Types(Enum):
     FAIRY = 17
 
 
-pokemon_types = ["Normal", "Fire", "Water", "Electric", "Grass", "Ice",
-                 "Fighting", "Poison", "Ground", "Flying", "Psychic",
-                 "Bug", "Rock", "Ghost", "Dragon", "Dark", "Steel", "Fairy"]
+pokemon_types = ["Nrml", "Fire", "Water", "Elec", "Grass", "Ice",
+                 "Fight", "Psn", "Grnd", "Fly", "Psyc",
+                 "Bug", "Rock", "Ghost", "Drgn", "Dark", "Steel", "Fairy"]
+pokemon_types_full = ["Normal", "Fire", "Water", "Electric", "Grass", "Ice",
+                      "Fighting", "Poison", "Ground", "Flying", "Psychic",
+                      "Bug", "Rock", "Ghost", "Dragon", "Dark", "Steel", "Fairy"]
 
 # Can be indexed like type_chart
 type_chart = np.array([[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 / 2, 0, 1, 1, 1 / 2, 1],
@@ -55,6 +58,8 @@ class PokemonGame():
     def __init__(self, team1, team2):
         self.team1 = team1
         self.team2 = team2
+        self.team1_permutations = list(itertools.permutations(self.team1))
+        self.team2_permutations = list(itertools.permutations(self.team2))
         self.utility_matrix = calculateUtilities(team1, team2)
         self.nash_eqs = calculateNash(self)
 
@@ -62,11 +67,8 @@ class PokemonGame():
 # Calculate the utility matrix for two given teams
 def calculateUtilities(team1, team2):
     utilities = np.zeros((6, 6), dtype='i,i')
-    print(list(range(3)))
     team1_permutations = list(itertools.permutations(team1))
     team2_permutations = list(itertools.permutations(team2))
-    print(team2_permutations[0][0].value)
-    print(team2_permutations)
     for i in range(len(team1_permutations)):
         for j in range(len(team2_permutations)):
             team1_effectiveness = np.zeros(3)
@@ -114,6 +116,17 @@ def calculateNash(pokemon_game):
     nash_EQs = nash_game.support_enumeration()
 
     return list(nash_EQs)
+
+
+def convertEnumToString(enums_permutations):
+    string_permutations = np.zeros((6, 3), dtype=np.dtype('U100'))
+    for i in range(len(enums_permutations)):
+        current = enums_permutations[i]
+        for j in range(len(current)):
+            ind = current[j].value
+            string_permutations[i, j] = pokemon_types[ind]
+
+    return string_permutations
 
 
 # def calculateNash2(game):
