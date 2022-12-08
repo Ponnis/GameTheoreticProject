@@ -53,6 +53,11 @@ type_chart = np.array([[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 / 2, 0, 1, 1, 1 / 
                        [1, 1 / 2, 1 / 2, 1 / 2, 1, 2, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1 / 2, 2],
                        [1, 1 / 2, 1, 1, 1, 1, 2, 1 / 2, 1, 1, 1, 1, 1, 1, 2, 2, 1 / 2, 1]])
 
+possible_types = [Types.NORMAL, Types.FIRE, Types.WATER, Types.ELECTRIC, Types.GRASS, Types.ICE, Types.FIGHT,
+                  Types.POISON, Types.GROUND,
+                  Types.FLYING, Types.PSYCHIC, Types.BUG, Types.ROCK, Types.GHOST, Types.DRAGON, Types.DARK,
+                  Types.STEEL, Types.FAIRY]
+
 
 class PokemonGame():
     def __init__(self, team1, team2):
@@ -64,7 +69,7 @@ class PokemonGame():
         self.nash_eqs = calculateNash(self)
 
 
-# Calculate the utility matrix for two given teams
+# Calculate the utility matrix for all given permutations of a team
 def calculateUtilities(team1, team2):
     team1_permutations = list(itertools.permutations(team1))
     team2_permutations = list(itertools.permutations(team2))
@@ -82,6 +87,7 @@ def calculateUtilities(team1, team2):
     return utilities
 
 
+# Converts from effectiveness from the type chart to utility
 def effectivenessToUtility(team1_utilities, team2_utilities):
     p1_utility = 0
     p2_utility = 0
@@ -98,6 +104,7 @@ def effectivenessToUtility(team1_utilities, team2_utilities):
     return p1_utility, p2_utility
 
 
+#Splits utilities for player into two matrices
 def splitUtilities(utilities):
     m_len = int(np.sqrt(utilities.size))
     player1_utilities = np.zeros((m_len, m_len), dtype='i')
@@ -120,6 +127,7 @@ def calculateNash(pokemon_game):
     return list(nash_EQs)
 
 
+#Converts the Types.NORMAL to an int representing index
 def convertEnumToString(enums_permutations):
     string_permutations = np.zeros((len(enums_permutations), int(len(enums_permutations) / 2)), dtype=np.dtype('U100'))
     for i in range(len(enums_permutations)):
@@ -129,6 +137,35 @@ def convertEnumToString(enums_permutations):
             string_permutations[i, j] = pokemon_types[ind]
 
     return string_permutations
+
+
+# Determines static game winner depending on team size
+def staticWinner(team_size):
+    all_teams = list(itertools.permutations(possible_types, team_size))
+    all_utilities = np.zeros((len(all_teams), len(all_teams)), dtype=('i,i'))
+    total_utilities = np.zeros(len(all_teams))
+    for i in range(len(all_teams)):
+        for j in range(len(all_teams)):
+            all_utilities[i][j] = staticUtilityHelper(all_teams[i], all_teams[j])
+
+    for k in range(len(all_utilities)):
+        total_utilities[k] = sum(l for l, m in all_utilities[k])
+
+    win_index = list(total_utilities).index(max(total_utilities))
+    print("Winning team of " + str(team_size) + " in the static approach is:" + str(
+        all_teams[win_index]) + " with an average utility of: " + str(max(total_utilities) / len(total_utilities)))
+    return all_teams[win_index]
+
+
+# Calculates utility given two teams
+def staticUtilityHelper(team1, team2):
+    team1_utilities = np.zeros(3)
+    team2_utilities = np.zeros(3)
+    for i in range(len(team1)):
+        team1_utilities[i] = type_chart[team1[i].value][team2[i].value]
+        team2_utilities[i] = type_chart[team2[i].value][team1[i].value]
+
+    return effectivenessToUtility(team1_utilities, team2_utilities)
 
 
 # def calculateNash2(game):
