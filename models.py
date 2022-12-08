@@ -154,6 +154,18 @@ def staticWinner(team_size):
     win_index = list(total_utilities).index(max(total_utilities))
     print("Winning team of " + str(team_size) + " in the static approach is:" + str(
         all_teams[win_index]) + " with an average utility of: " + str(max(total_utilities) / len(total_utilities)))
+    runner_ups = [all_teams[i] for i in np.argsort(total_utilities)[-10:]]
+    runner_ups_utilities = [total_utilities[i] for i in np.argsort(total_utilities)[-10:]]
+    worst = [all_teams[i] for i in np.argsort(total_utilities)[0:10]]
+    worst_utilities = [total_utilities[i] for i in np.argsort(total_utilities)[0:10]]
+
+    print("Runner ups are: " + str(runner_ups[1]) + " and " + str(runner_ups[2]) + " with avg utilities of: " + str(
+        runner_ups_utilities[1] / len(total_utilities))
+          + " and " + str(runner_ups_utilities[2] / len(total_utilities)))
+    print("Worst performing combination was: " + str(worst[0]) + " and " + str(
+        worst[1]) + " with avg utilities of: " + str(worst_utilities[0] / len(total_utilities))
+          + " and " + str(worst_utilities[1] / len(total_utilities)))
+
     return all_teams[win_index]
 
 

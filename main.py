@@ -7,5 +7,4 @@ example_game = m.PokemonGame(team1=[m.Types.GRASS, m.Types.WATER, m.Types.DARK],
 
 print(example_game.utility_matrix)
 print(m.splitUtilities(example_game.utility_matrix))
-print(models.staticWinner(3))
-print(example_game.nash_eqs)
+models.staticWinner(2)
