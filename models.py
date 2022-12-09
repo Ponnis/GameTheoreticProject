@@ -138,15 +138,21 @@ def calculateNash(utilities):
 def probabilistic_battle(team1,team2,num_rounds):
     utility_matrix = calculateUtilities(team1, team2)
     nash_eqs = calculateNash(utility_matrix)
+    num_nashes = len(nash_eqs)
 
     p1_pick = -1  # Initialized to -1 so that we will get an error if no pick is made
     p2_pick = -1
     scores = [0,0]
+
+    if len(nash_eqs) == 0:
+        # TODO: Can't think at the moment
+        return [0,0]
+
     num_options = len(nash_eqs[0][0])  # Will probably always be 6
     for n in range(num_rounds):
         rP1 = np.random.rand()
         rP2 = np.random.rand()
-        nash_index = np.random.randint(len(nash_eqs))
+        nash_index = np.random.randint(num_nashes)
         for k in range(num_options):
             mixed_k1 = nash_eqs[nash_index][0][k]
             mixed_k2 = nash_eqs[nash_index][1][k]
@@ -171,8 +177,12 @@ def deterministic_battle(team1,team2):
     utility_matrix = calculateUtilities(team1, team2)
     nash_eqs = calculateNash(utility_matrix)
     averaged_utilities = [0,0]  # [p1,p2]
-    num_options = len(nash_eqs[0][0])  # Will probably always be 6
     num_nashes = len(nash_eqs)
+    if num_nashes == 0:
+        # TODO: Can't think at the moment
+        return [0,0]
+
+    num_options = len(nash_eqs[0][0])  # Will probably always be 6
 
     for nash_index in range(num_nashes):
         for i in range(num_options):
