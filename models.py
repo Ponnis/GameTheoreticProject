@@ -162,7 +162,7 @@ def staticWinner(team_size):
     print("Runner ups are: " + str(runner_ups[1]) + " and " + str(runner_ups[2]) + " with avg utilities of: " + str(
         runner_ups_utilities[1] / len(total_utilities))
           + " and " + str(runner_ups_utilities[2] / len(total_utilities)))
-    print("Worst performing combination was: " + str(worst[0]) + " and " + str(
+    print("Worst performing combinations were: " + str(worst[0]) + " and " + str(
         worst[1]) + " with avg utilities of: " + str(worst_utilities[0] / len(total_utilities))
           + " and " + str(worst_utilities[1] / len(total_utilities)))
 
