@@ -66,7 +66,7 @@ class PokemonGame():
         self.team1_permutations = list(itertools.permutations(self.team1))
         self.team2_permutations = list(itertools.permutations(self.team2))
         self.utility_matrix = calculateUtilities(team1, team2)
-        self.nash_eqs = calculateNash(self)
+        self.nash_eqs = calculateNash(self.utility_matrix)
 
 
 # Calculate the utility matrix for all given permutations of a team
@@ -118,8 +118,7 @@ def splitUtilities(utilities):
 
 
 # Calculate the mixed nash for a given zero-sum game
-def calculateNash(pokemon_game):
-    utilities = pokemon_game.utility_matrix
+def calculateNash(utilities):
     A, B = splitUtilities(utilities)
     nash_game = nashpy.Game(A, B)
     nash_EQs = nash_game.support_enumeration()
@@ -199,8 +198,65 @@ def staticUtilityHelper(team1, team2):
 # match indices , if match, that is a nash eq.
 
 
-# Perform a battle with selections based on the nash_EQ and return the resulting score for each player
+# Perform a battle with random selections based on the nash_EQ and return the resulting score for each player
 # Output: [scoreP1, scoreP2]
-def battle(pokemon_game):
-    scores = [0, 0]
+def probabilistic_battle(team1,team2,num_rounds):
+    utility_matrix = calculateUtilities(team1, team2)
+    nash_eqs = calculateNash(utility_matrix)
+    num_nashes = len(nash_eqs)
+
+    p1_pick = -1  # Initialized to -1 so that we will get an error if no pick is made
+    p2_pick = -1
+    scores = [0,0]
+
+    if len(nash_eqs) == 0:
+        # TODO: Can't think at the moment
+        return [0,0]
+
+    num_options = len(nash_eqs[0][0])  # Will probably always be 6
+    for n in range(num_rounds):
+        rP1 = np.random.rand()
+        rP2 = np.random.rand()
+        nash_index = np.random.randint(num_nashes)
+        for k in range(num_options):
+            mixed_k1 = nash_eqs[nash_index][0][k]
+            mixed_k2 = nash_eqs[nash_index][1][k]
+            if rP1 < mixed_k1:
+                p1_pick = k
+            else:
+                rP1 -= mixed_k1
+            if rP2 < mixed_k2:
+                p2_pick = k
+            else:
+                rP2 -= mixed_k2
+
+        scores[0] += utility_matrix[p1_pick][p2_pick][0]
+        scores[1] += utility_matrix[p1_pick][p2_pick][1]
+    scores[0] = scores[0]/num_rounds
+    scores[1] = scores[1]/num_rounds
+
     return scores
+
+# Calculating theoretical result as they would have been after an infinite amount of battles.
+def deterministic_battle(team1,team2):
+    utility_matrix = calculateUtilities(team1, team2)
+    nash_eqs = calculateNash(utility_matrix)
+    averaged_utilities = [0,0]  # [p1,p2]
+    num_nashes = len(nash_eqs)
+    if num_nashes == 0:
+        # TODO: Can't think at the moment
+        return [0,0]
+
+    num_options = len(nash_eqs[0][0])  # Will probably always be 6
+
+    for nash_index in range(num_nashes):
+        for i in range(num_options):
+            for j in range(num_options):
+                #  I think this is the correct way to compute it
+                averaged_utilities[0] += nash_eqs[nash_index][0][i] * nash_eqs[nash_index][1][j] * utility_matrix[i][j][0]
+                averaged_utilities[1] += nash_eqs[nash_index][0][i] * nash_eqs[nash_index][1][j] * utility_matrix[i][j][1]
+
+    averaged_utilities[0] = averaged_utilities[0] / num_nashes
+    averaged_utilities[1] = averaged_utilities[1] / num_nashes
+
+    return averaged_utilities
