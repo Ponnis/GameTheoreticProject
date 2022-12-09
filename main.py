@@ -1,6 +1,10 @@
+import models
 import models as m
+import visualization
 
-example_game = m.PokemonGame(team1=[m.Types.DRAGON, m.Types.DRAGON, m.Types.BUG],
-                             team2=[m.Types.ICE, m.Types.FIGHT, m.Types.FAIRY])
+example_game = m.PokemonGame(team1=[m.Types.GRASS, m.Types.WATER, m.Types.DARK],
+                             team2=[m.Types.GRASS, m.Types.WATER, m.Types.BUG])
+
 print(example_game.utility_matrix)
-print(example_game.nash_eqs)
+print(m.splitUtilities(example_game.utility_matrix))
+models.staticWinner(2)
