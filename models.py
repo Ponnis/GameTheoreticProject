@@ -137,7 +137,6 @@ def calculateNash(utilities):
     A, B = splitUtilities(utilities)
     nash_game = nashpy.Game(A, B)
     nash_EQs = nash_game.support_enumeration()
-
     return list(nash_EQs)
 
 
