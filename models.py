@@ -69,6 +69,21 @@ class PokemonGame():
         self.nash_eqs = calculateNash(self.utility_matrix)
 
 
+# Gets huge lookup dictionary
+def getLookupDict(num):
+    combinations = list(itertools.combinations_with_replacement(possible_types, num))
+    big_dict = dict()
+    for i in range(len(combinations)):
+        for j in range(len(combinations)):
+            big_dict[str([combinations[i], combinations[j]])] = staticUtilityHelper(combinations[i], combinations[j])
+    return big_dict
+
+
+# Looks up value in dictionary
+def lookupValue(team1, team2, dict):
+    return dict[str([tuple(team1), tuple(team2)])]
+
+
 # Calculate the utility matrix for all given permutations of a team
 def calculateUtilities(team1, team2):
     team1_permutations = list(itertools.permutations(team1))
@@ -79,8 +94,8 @@ def calculateUtilities(team1, team2):
             team1_effectiveness = np.zeros(len(team1))
             team2_effectiveness = np.zeros(len(team1))
             for k in range(len(team1)):
-                team2_effectiveness[k] = type_chart[team1_permutations[i][k].value, team2_permutations[j][k].value]
-                team1_effectiveness[k] = type_chart[team2_permutations[j][k].value, team1_permutations[i][k].value]
+                team1_effectiveness[k] = type_chart[team1_permutations[i][k].value, team2_permutations[j][k].value]
+                team2_effectiveness[k] = type_chart[team2_permutations[j][k].value, team1_permutations[i][k].value]
 
             utilities[i, j] = effectivenessToUtility(team1_effectiveness, team2_effectiveness)
 
