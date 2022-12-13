@@ -136,15 +136,19 @@ def convertEnumToString(enums_permutations):
 
     return string_permutations
 
+#def generateGiantHeatMap(teams):
 
 # Determines static game winner depending on team size
 def staticWinner(team_size):
-    all_teams = list(itertools.permutations(possible_types, team_size))
+    all_teams = list(itertools.combinations(possible_types, team_size))
     all_utilities = np.zeros((len(all_teams), len(all_teams)), dtype=('i,i'))
     total_utilities = np.zeros(len(all_teams))
     for i in range(len(all_teams)):
-        for j in range(len(all_teams)):
-            all_utilities[i][j] = staticUtilityHelper(all_teams[i], all_teams[j])
+        for j in range(i):
+            score_set = deterministic_battle(all_teams[i], all_teams[j])
+            all_utilities[i][j] = score_set
+            all_utilities[j][i] = (score_set[1],score_set[0])
+        print(str(100*i/len(all_teams)) + "% of the matrix computed.")
 
     for k in range(len(all_utilities)):
         total_utilities[k] = sum(l for l, m in all_utilities[k])
@@ -258,4 +262,4 @@ def deterministic_battle(team1,team2):
     averaged_utilities[0] = averaged_utilities[0] / num_nashes
     averaged_utilities[1] = averaged_utilities[1] / num_nashes
 
-    return averaged_utilities
+    return averaged_utilities[0], averaged_utilities[1]

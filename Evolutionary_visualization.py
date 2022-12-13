@@ -30,7 +30,26 @@ def visualize_generations(players_over_time):
 
     plt.show()
 
+def create_typing_distribution(players_over_time):
+    generations = len(players_over_time)
+    total_mons = len(players_over_time[0]) * len(players_over_time[0][0])
+    distribution_matrix = np.zeros((generations, 18))
+    for time in range(generations):
+        for team in players_over_time[time]:
+            for mon in team:
+                distribution_matrix[time][mon.value] += 1 / total_mons
 
+    return distribution_matrix
+
+def visualize_typing_evolution(players_over_time):
+
+    distribution_matrix = create_typing_distribution(players_over_time)
+
+    for x in range(len(distribution_matrix[0])):
+        plt.plot(range(len(players_over_time)), distribution_matrix[:, x])
+        plt.legend(m.pokemon_types_full)
+
+    plt.show()
 
 
 

@@ -22,12 +22,19 @@ class EvolutionarySimulation():
         #            player_list[i] = [mon1, mon2, mon3]
         #            i += 1
 
-        player_list = np.array([[m.Types.GRASS, m.Types.WATER, m.Types.DARK],
-                                [m.Types.GRASS, m.Types.WATER, m.Types.BUG],
-                                [m.Types.FIRE, m.Types.STEEL, m.Types.BUG],
-                                [m.Types.NORMAL, m.Types.PSYCHIC, m.Types.DRAGON],
-                                [m.Types.DARK, m.Types.FIRE, m.Types.DARK],
-                                [m.Types.STEEL, m.Types.ELECTRIC, m.Types.ICE]])
+        #player_list = np.array([[m.Types.GRASS, m.Types.WATER, m.Types.DARK],
+        #                        [m.Types.GRASS, m.Types.WATER, m.Types.BUG],
+        #                        [m.Types.FIRE, m.Types.STEEL, m.Types.BUG],
+        #                        [m.Types.NORMAL, m.Types.PSYCHIC, m.Types.DRAGON],
+        #                        [m.Types.DARK, m.Types.FIRE, m.Types.DARK],
+        #                        [m.Types.STEEL, m.Types.ELECTRIC, m.Types.ICE]])
+
+        player_list = np.full((18,3),m.Types.NORMAL)
+        i = 0  # Lmao
+        for mon in m.Types:
+            player_list[i] = [mon, mon, mon]
+            i += 1
+
         return player_list
 
     # Help method to find where to cut off a list.
@@ -86,7 +93,7 @@ class EvolutionarySimulation():
             for p2 in range(p1):
                 team1 = self.player_list[p1]
                 team2 = self.player_list[p2]
-                scores = m.probabilistic_battle(team1,team2,3)
+                scores = m.probabilistic_battle(team1,team2,num_rounds=5)
                 self.score_list[p1] += scores[0]
                 self.score_list[p2] += scores[1]
 
@@ -94,14 +101,14 @@ class EvolutionarySimulation():
     def play_one_round(self):
         self.play_game()
         self.switch_pokemon(0,0.1,0.2)
-        return self.player_list
+        return self.player_list.copy()
 
 
 # --------- SOME LINES TO TEST THE METHODS -----------
-sim = EvolutionarySimulation()
-for gen in range(10):
-    sim.play_one_round()
-    print(sim.player_list)
+#sim = EvolutionarySimulation()
+#for gen in range(10):
+#    sim.play_one_round()
+#    print(sim.player_list)
 
 
 
