@@ -3,7 +3,7 @@ from enum import Enum
 import numpy as np
 import nashpy
 import itertools
-
+import json
 
 class Types(Enum):
     NORMAL = 0
@@ -67,6 +67,27 @@ class PokemonGame():
         self.team2_permutations = list(itertools.permutations(self.team2))
         self.utility_matrix = calculateUtilities(team1, team2)
         self.nash_eqs = calculateNash(self.utility_matrix)
+
+
+def loadNashLookupDict():
+    with open('dict.json') as json_file:
+        nash_dict = json.load(json_file)
+
+        return nash_dict
+
+
+def getNashLookupDict(num):
+    combinations = list(itertools.combinations_with_replacement(possible_types, num))
+    nash_lookup = dict()
+    for i in range(len(combinations)):
+        for j in range(len(combinations)):
+            nash_lookup[str([combinations[i], combinations[j]])] = deterministic_battle(combinations[i],
+                                                                                        combinations[j])
+
+    file_dump = json.dumps(nash_lookup)
+    f = open("dict.json", "w")
+    f.write(file_dump)
+    return nash_lookup
 
 
 # Gets huge lookup dictionary
@@ -154,7 +175,7 @@ def convertEnumToString(enums_permutations):
 
 # Determines static game winner depending on team size
 def staticWinner(team_size):
-    all_teams = list(itertools.permutations(possible_types, team_size))
+    all_teams = list(itertools.combinations_with_replacement(possible_types, team_size))
     all_utilities = np.zeros((len(all_teams), len(all_teams)), dtype=('i,i'))
     total_utilities = np.zeros(len(all_teams))
     for i in range(len(all_teams)):
@@ -184,8 +205,8 @@ def staticWinner(team_size):
 
 # Calculates utility given two teams
 def staticUtilityHelper(team1, team2):
-    team1_utilities = np.zeros(3)
-    team2_utilities = np.zeros(3)
+    team1_utilities = np.zeros(len(team1))
+    team2_utilities = np.zeros(len(team2))
     for i in range(len(team1)):
         team1_utilities[i] = type_chart[team1[i].value][team2[i].value]
         team2_utilities[i] = type_chart[team2[i].value][team1[i].value]
