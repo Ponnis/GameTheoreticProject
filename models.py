@@ -75,7 +75,7 @@ def getLookupDict(num):
     big_dict = dict()
     for i in range(len(combinations)):
         for j in range(len(combinations)):
-            big_dict[str([combinations[i], combinations[j]])] = staticUtilityHelper(combinations[i], combinations[j])
+            big_dict[str([combinations[i], combinations[j]])] = deterministic_battle(combinations[i], combinations[j])
     return big_dict
 
 
@@ -155,15 +155,16 @@ def convertEnumToString(enums_permutations):
 
 # Determines static game winner depending on team size
 def staticWinner(team_size):
-    all_teams = list(itertools.combinations(possible_types, team_size))
+    all_teams = list(itertools.combinations_with_replacement(possible_types, team_size))
     all_utilities = np.zeros((len(all_teams), len(all_teams)), dtype=('i,i'))
     total_utilities = np.zeros(len(all_teams))
     for i in range(len(all_teams)):
         for j in range(i):
             score_set = deterministic_battle(all_teams[i], all_teams[j])
-            all_utilities[i][j] = score_set
+            all_utilities[i][j] = (score_set[0],score_set[1])
             all_utilities[j][i] = (score_set[1],score_set[0])
-        print(str(100*i/len(all_teams)) + "% of the matrix computed.")
+        percentage_computed = 100*i/len(all_teams)
+        print("%.1f percent of the matrix computed." % percentage_computed)
 
     for k in range(len(all_utilities)):
         total_utilities[k] = sum(l for l, m in all_utilities[k])
@@ -228,8 +229,7 @@ def probabilistic_battle(team1,team2,num_rounds):
     scores = [0,0]
 
     if len(nash_eqs) == 0:
-        # TODO: Can't think at the moment
-        return [0,0]
+        return staticUtilityHelper(team1, team2)
 
     num_options = len(nash_eqs[0][0])  # Will probably always be 6
     for n in range(num_rounds):
@@ -262,8 +262,7 @@ def deterministic_battle(team1,team2):
     averaged_utilities = [0,0]  # [p1,p2]
     num_nashes = len(nash_eqs)
     if num_nashes == 0:
-        # TODO: Can't think at the moment
-        return [0,0]
+        return staticUtilityHelper(team1,team2)
 
     num_options = len(nash_eqs[0][0])  # Will probably always be 6
 
