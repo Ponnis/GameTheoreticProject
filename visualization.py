@@ -30,6 +30,6 @@ def plotGame(game):
 fig, ax = plt.subplots()
 ax = sns.heatmap(models.type_chart, annot=models.type_chart, fmt='', cmap="Greens",
                  xticklabels=models.pokemon_types, yticklabels=models.pokemon_types)
-print(models.Types.DRAGON.value)
+
 plt.title("Type interaction chart", size=18, color="#b30000")
-plt.show()
+# plt.show()

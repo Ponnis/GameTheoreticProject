@@ -3,7 +3,7 @@ from enum import Enum
 import numpy as np
 import nashpy
 import itertools
-
+import json
 
 class Types(Enum):
     NORMAL = 0
@@ -69,13 +69,34 @@ class PokemonGame():
         self.nash_eqs = calculateNash(self.utility_matrix)
 
 
+def loadNashLookupDict():
+    with open('dict.json') as json_file:
+        nash_dict = json.load(json_file)
+
+        return nash_dict
+
+
+def getNashLookupDict(num):
+    combinations = list(itertools.combinations_with_replacement(possible_types, num))
+    nash_lookup = dict()
+    for i in range(len(combinations)):
+        for j in range(len(combinations)):
+            nash_lookup[str([combinations[i], combinations[j]])] = deterministic_battle(combinations[i],
+                                                                                        combinations[j])
+
+    file_dump = json.dumps(nash_lookup)
+    f = open("dict.json", "w")
+    f.write(file_dump)
+    return nash_lookup
+
+
 # Gets huge lookup dictionary
 def getLookupDict(num):
     combinations = list(itertools.combinations_with_replacement(possible_types, num))
     big_dict = dict()
     for i in range(len(combinations)):
         for j in range(len(combinations)):
-            big_dict[str([combinations[i], combinations[j]])] = deterministic_battle(combinations[i], combinations[j])
+            big_dict[str([combinations[i], combinations[j]])] = staticUtilityHelper(combinations[i], combinations[j])
     return big_dict
 
 
@@ -151,7 +172,33 @@ def convertEnumToString(enums_permutations):
 
     return string_permutations
 
-#def generateGiantHeatMap(teams):
+def staticWinnerWithNash(team_size):
+    all_teams = list(itertools.combinations_with_replacement(possible_types, team_size))
+    all_utilities = np.zeros(shape=(len(all_teams), len(all_teams), team_size))
+    total_utilities = np.zeros(len(all_teams))
+    nash_dict = loadNashLookupDict()
+    for i in range(len(all_teams)):
+        for j in range(len(all_teams)):
+            all_utilities[i][j] = lookupValue(all_teams[i], all_teams[j], nash_dict)
+    for k in range(len(all_utilities)):
+        total_utilities[k] = sum(l for l, m in all_utilities[k])
+
+    win_index = list(total_utilities).index(max(total_utilities))
+    print("Winning team of " + str(team_size) + " in the static approach is:" + str(
+        all_teams[win_index]) + " with an average utility of: " + str(max(total_utilities) / len(total_utilities)))
+    runner_ups = [all_teams[i] for i in np.argsort(total_utilities)[-10:]]
+    runner_ups_utilities = [total_utilities[i] for i in np.argsort(total_utilities)[-10:]]
+    worst = [all_teams[i] for i in np.argsort(total_utilities)[0:10]]
+    worst_utilities = [total_utilities[i] for i in np.argsort(total_utilities)[0:10]]
+
+    print("Runner ups are: " + str(runner_ups[1]) + " and " + str(runner_ups[2]) + " with avg utilities of: " + str(
+        runner_ups_utilities[1] / len(total_utilities))
+          + " and " + str(runner_ups_utilities[2] / len(total_utilities)))
+    print("Worst performing combinations were: " + str(worst[0]) + " and " + str(
+        worst[1]) + " with avg utilities of: " + str(worst_utilities[0] / len(total_utilities))
+          + " and " + str(worst_utilities[1] / len(total_utilities)))
+
+    return all_teams[win_index]
 
 # Determines static game winner depending on team size
 def staticWinner(team_size):
@@ -189,8 +236,8 @@ def staticWinner(team_size):
 
 # Calculates utility given two teams
 def staticUtilityHelper(team1, team2):
-    team1_utilities = np.zeros(3)
-    team2_utilities = np.zeros(3)
+    team1_utilities = np.zeros(len(team1))
+    team2_utilities = np.zeros(len(team2))
     for i in range(len(team1)):
         team1_utilities[i] = type_chart[team1[i].value][team2[i].value]
         team2_utilities[i] = type_chart[team2[i].value][team1[i].value]
@@ -276,4 +323,4 @@ def deterministic_battle(team1,team2):
     averaged_utilities[0] = averaged_utilities[0] / num_nashes
     averaged_utilities[1] = averaged_utilities[1] / num_nashes
 
-    return averaged_utilities[0], averaged_utilities[1]
+    return averaged_utilities
