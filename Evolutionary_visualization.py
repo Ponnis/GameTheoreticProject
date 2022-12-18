@@ -3,6 +3,29 @@ import matplotlib.pyplot as plt
 import matplotlib.animation
 import models as m
 
+class EvolutionaryVisualization:
+    def __init__(self,initial_generation):
+        typing_distribution = create_typing_distribution([initial_generation])
+        self.hl = []
+        for typing_index in range(len(typing_distribution[0])):
+            self.hl.append(plt.plot(0, typing_distribution[0][typing_index]))
+            self.hl[typing_index][0].set_color(m.type_colors[typing_index])
+        plt.draw()
+        plt.pause(0.01)  # is necessary for the plot to update for some reason
+        #plt.axis([0, 20, 0, 0.4])
+        plt.legend(m.pokemon_types_full)
+        #plt.show()
+
+    def update_line(self, gen, new_data):
+        new_data = create_typing_distribution([new_data])
+        for type_index in range(len(new_data[0])):
+            self.hl[type_index][0].set_xdata(np.append(self.hl[type_index][0].get_xdata(), gen))
+            self.hl[type_index][0].set_ydata(np.append(self.hl[type_index][0].get_ydata(), new_data[0][type_index]))
+        plt.draw()
+        plt.pause(0.01)
+        plt.axis([0, gen, 0, 0.4])
+
+
 def visualize_generations(players_over_time):
 
     unique_teams = dict()
@@ -42,7 +65,6 @@ def create_typing_distribution(players_over_time):
     return distribution_matrix
 
 def visualize_typing_evolution(players_over_time):
-
     distribution_matrix = create_typing_distribution(players_over_time)
 
     for x in range(len(distribution_matrix[0])):
@@ -50,6 +72,10 @@ def visualize_typing_evolution(players_over_time):
         plt.legend(m.pokemon_types_full)
 
     plt.show()
+
+
+
+
 
 
 

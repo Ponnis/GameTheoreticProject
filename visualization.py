@@ -26,10 +26,10 @@ def plotGame(game):
     plt.show()
 
 
-# Plotting a basic type chart
-fig, ax = plt.subplots()
-ax = sns.heatmap(models.type_chart, annot=models.type_chart, fmt='', cmap="Greens",
-                 xticklabels=models.pokemon_types, yticklabels=models.pokemon_types)
+# Plotting a basic type chart (AHA! FOUND IT!)
+#fig, ax = plt.subplots()
+#ax = sns.heatmap(models.type_chart, annot=models.type_chart, fmt='', cmap="Greens",
+#                 xticklabels=models.pokemon_types, yticklabels=models.pokemon_types)
 
-plt.title("Type interaction chart", size=18, color="#b30000")
+#plt.title("Type interaction chart", size=18, color="#b30000")
 # plt.show()

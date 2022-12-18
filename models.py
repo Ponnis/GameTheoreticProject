@@ -32,6 +32,9 @@ pokemon_types = ["Nor", "Fir", "Wtr", "Ele", "Grs", "Ice",
 pokemon_types_full = ["Normal", "Fire", "Water", "Electric", "Grass", "Ice",
                       "Fighting", "Poison", "Ground", "Flying", "Psychic",
                       "Bug", "Rock", "Ghost", "Dragon", "Dark", "Steel", "Fairy"]
+type_colors = ['#A8A77A', '#EE8130', '#6390F0', '#F7D02C', '#7AC74C', '#96D9D6',
+               '#C22E28', '#A33EA1', '#E2BF65', '#A98FF3', '#F95587', '#A6B91A',
+               '#B6A136', '#735797', '#6F35FC', '#705746', '#B7B7CE', '#D685AD']
 
 # Can be indexed like type_chart
 type_chart = np.array([[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 / 2, 0, 1, 1, 1 / 2, 1],
@@ -102,7 +105,22 @@ def getLookupDict(num):
 
 # Looks up value in dictionary
 def lookupValue(team1, team2, dict):
-    return dict[str([tuple(team1), tuple(team2)])]
+    try:
+        return dict[str([tuple(team1), tuple(team2)])]
+    except KeyError:
+        try:
+            return dict[str([tuple(team1), tuple([team2[1], team2[0]])])]
+        except KeyError:
+            try:
+                return dict[str([tuple([team1[1], team1[0]]), tuple(team2)])]
+            except KeyError:
+                try:
+                    return dict[str([tuple([team1[1], team1[0]]), tuple([team2[1], team2[0]])])]
+                except KeyError:
+                    print("Still doesn't work lmao.")
+                    print("Team1 = " + str(team1))
+                    print("Team2 = " + str(team2))
+
 
 
 # Calculate the utility matrix for all given permutations of a team

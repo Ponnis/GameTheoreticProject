@@ -3,11 +3,15 @@ import numpy as np
 
 class EvolutionarySimulation():
 
-    def __init__(self):
-        self.team_size = 3
+    def __init__(self,team_size,population_size, survival_limit, trade_prob, transfer_prob):
+        self.team_size = team_size
+        self.num_players = population_size
+        self.survival_limit = survival_limit
+        self.trade_prob = trade_prob
+        self.transfer_prob = transfer_prob
         self.player_list = self.initialize_players()
-        self.num_players = len(self.player_list)
         self.score_list = np.zeros(self.num_players)
+        self.nash_dict = m.loadNashLookupDict()
 
     # Generates teams of initial players. Right now it makes one of each combinations (including more types on the same team).
     # Might change to something else later. This was easier to implement.
@@ -29,10 +33,11 @@ class EvolutionarySimulation():
         #                        [m.Types.DARK, m.Types.FIRE, m.Types.DARK],
         #                        [m.Types.STEEL, m.Types.ELECTRIC, m.Types.ICE]])
 
-        player_list = np.full((18,3),m.Types.NORMAL)
+        num_per_comb = self.num_players // 18
+        player_list = np.full((18*num_per_comb,self.team_size),m.Types.NORMAL)
         i = 0  # Lmao
         for mon in m.Types:
-            player_list[i] = [mon, mon, mon]
+            player_list[i*num_per_comb:(i+1)*num_per_comb] = np.full(self.team_size,mon)
             i += 1
 
         return player_list
@@ -85,7 +90,7 @@ class EvolutionarySimulation():
                 # They also have a probability for each of their Pokémon to be switched out for another
                 # one at random with uniform distribution over types.
                 if np.random.rand() < mutation_probability:
-                    self.player_list[i][j] = m.Types(np.random.randint(0,17))
+                    self.player_list[i][j] = m.Types(np.random.randint(0,18))
 
     # Let all players battle each other and evaluate score
     def play_game(self):
@@ -93,14 +98,14 @@ class EvolutionarySimulation():
             for p2 in range(p1):
                 team1 = self.player_list[p1]
                 team2 = self.player_list[p2]
-                scores = m.probabilistic_battle(team1,team2,num_rounds=5)
+                scores = m.lookupValue(team1, team2, self.nash_dict)
                 self.score_list[p1] += scores[0]
                 self.score_list[p2] += scores[1]
 
     # Play the simulator for one generation and return the state. (To be called from outside)
     def play_one_round(self):
         self.play_game()
-        self.switch_pokemon(0,0.1,0.2)
+        self.switch_pokemon(self.survival_limit,self.trade_prob,self.transfer_prob)
         return self.player_list.copy()
 
 
